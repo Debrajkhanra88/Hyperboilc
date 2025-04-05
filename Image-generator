@@ -1,1 +1,135 @@
+import requests
+import time
+import random
+import json
+from datetime import datetime
+
+# === Hyperbolic API Configuration ===
+URL = "https://api.hyperbolic.xyz/v1/image/generation"
+HEADERS = {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer YOUR_API_KEY_HERE"  # Replace with your actual key
+}
+
+# === Prompt List ===
+prompts = [
+    "A futuristic city skyline at night with flying cars",
+    "An enchanted forest glowing under the moonlight",
+    "A robotic samurai standing in a cherry blossom storm",
+    "A cozy cabin in the snowy mountains at sunrise",
+    "A surreal landscape with floating islands and waterfalls",
+    "An astronaut walking on Mars with Earth in the sky",
+    "A dragon soaring above a medieval castle",
+    "A cyberpunk street with neon lights and rain",
+    "A peaceful village in the hills during autumn",
+    "An underwater city with glowing sea creatures",
+    "A magical library hidden in the clouds",
+    "A spaceship flying through a colorful nebula",
+    "A gothic cathedral at sunset",
+    "A fairy sitting on a glowing mushroom",
+    "A steampunk airship flying over a desert",
+    "An alien marketplace on a distant planet",
+    "A wolf howling under the northern lights",
+    "A Viking ship sailing through a storm",
+    "A futuristic robot holding a rose",
+    "A haunted forest with glowing eyes in the dark",
+    "A mountain temple above the clouds",
+    "A fantasy castle floating on an island in the sky",
+    "A giant whale flying through the stars",
+    "A retro diner on a lonely highway at night",
+    "A lone knight standing on a cliff at dawn",
+    "A koi pond in a Zen garden",
+    "A treehouse village deep in the jungle",
+    "An angel flying through a stormy sky",
+    "A biomechanical creature in a digital wasteland",
+    "A phoenix rising from flames",
+    "A carnival at midnight with glowing rides",
+    "A minimalist Japanese living room in soft sunlight",
+    "A moonlit beach with glowing waves",
+    "A jungle temple being reclaimed by nature",
+    "A rainbow-colored waterfall in a fantasy world",
+    "A polar bear on a melting iceberg",
+    "A dreamlike desert with colorful sand dunes",
+    "A robot painter working in a Parisian studio",
+    "A time traveler stepping out of a glowing portal",
+    "A futuristic farm on a Martian colony",
+    "A grand piano in a candlelit room",
+    "A neon samurai battling shadow creatures",
+    "A magician summoning light from ancient ruins",
+    "A glowing fox in a snowy forest",
+    "A floating garden in a crystal sphere",
+    "An owl perched on a tree under starlight",
+    "A vintage train steaming through a foggy valley",
+    "A city skyline from a rooftop at golden hour",
+    "An epic battle between titans in the clouds",
+    "A child discovering a secret door in a tree",
+    # Add more as needed...
+]
+
+# === Configuration Settings ===
+MODEL_NAME = "SD2"
+ENABLE_REFINER = "false"
+NEGATIVE_PROMPT = ""
+STRENGTH = "0.8"
+STEPS = "30"
+CFG_SCALE = "5"
+RESOLUTION = "1024x1024"
+BACKEND = "auto"
+
+# === Enable Logging ===
+LOG_FILE = "image_generation_log.txt"
+
+def log_result(prompt, response_url):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open(LOG_FILE, "a") as f:
+        f.write(f"[{timestamp}] Prompt: {prompt}\n")
+        f.write(f"Image URL/Response: {response_url}\n\n")
+
+# === Image Generator ===
+def generate_image(prompt):
+    data = {
+        "model_name": MODEL_NAME,
+        "prompt": prompt,
+        "enable_refiner": ENABLE_REFINER,
+        "negative_prompt": NEGATIVE_PROMPT,
+        "strength": STRENGTH,
+        "steps": STEPS,
+        "cfg_scale": CFG_SCALE,
+        "resolution": RESOLUTION,
+        "backend": BACKEND
+    }
+
+    try:
+        response = requests.post(URL, headers=HEADERS, json=data)
+        response.raise_for_status()
+        result = response.json()
+        image_url = result.get("data", {}).get("url", "No URL returned")
+        print(f"\n✅ Prompt: {prompt}")
+        print(f"🖼️ Image URL: {image_url}")
+        log_result(prompt, image_url)
+    except Exception as e:
+        print(f"\n❌ Failed on prompt: {prompt}")
+        print(f"Error: {e}")
+        log_result(prompt, f"Error: {e}")
+
+# === Main Loop ===
+def run_image_bot(total=100):
+    used_prompts = set()
+    print("🚀 Starting Auto Image Generation Bot...\n")
+
+    for _ in range(total):
+        prompt = random.choice([p for p in prompts if p not in used_prompts])
+        used_prompts.add(prompt)
+        generate_image(prompt)
+
+        # Random delay between 30-60 seconds
+        delay = random.uniform(30, 60)
+        print(f"⏱️ Waiting {delay:.1f} seconds...\n")
+        time.sleep(delay)
+
+    print("\n🎉 Completed all image generations!")
+
+# === Start the Bot ===
+if __name__ == "__main__":
+    run_image_bot()
 
